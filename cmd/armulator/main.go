@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/omerhorev/goarmulator"
@@ -26,6 +27,8 @@ func main() {
 		return
 	}
 	defer a.Close()
+
+	a.Log = log.Default()
 
 	if err := a.Run(); err != nil {
 		MsgError("ERROR: %v\n", err)

@@ -30,4 +30,8 @@ func TestMemoryAllocator(t *testing.T) {
 
 	assert.Error(t, m.Free(uintptr(0)))
 	assert.Error(t, m.Free("a"))
+
+	m.Alloc(20)
+	assert.NoError(t, m.Close())
+
 }

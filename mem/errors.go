@@ -2,6 +2,8 @@ package mem
 
 import "fmt"
 
+// Represents a segmentation fault. Invalid access to a either an unallocated memory
+// or memory segments with wrong permissions
 type SegmentationFaultError struct {
 	Address           int64
 	AccessPermissions Permissions

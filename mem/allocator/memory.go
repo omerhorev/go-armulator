@@ -34,6 +34,14 @@ func (m Memory) Free(id any) error {
 	return nil
 }
 
+func (m Memory) Close() error {
+	for _, b := range m.allocation {
+		m.Free(b)
+	}
+
+	return nil
+}
+
 // Creates a new allocator that uses golang memory management
 func NewMemory() *Memory {
 	return &Memory{

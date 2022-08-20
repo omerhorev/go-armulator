@@ -13,4 +13,7 @@ type Allocator interface {
 
 	// Free a memory block by an id
 	Free(id any) error
+
+	// Closes the allocator, thus freeing all allocated resources
+	Close() error
 }

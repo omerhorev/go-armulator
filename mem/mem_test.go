@@ -67,15 +67,15 @@ func TestErrors(t *testing.T) {
 	m := NewMemFromMemory()
 	m.Alloc(10, 10, PermRead)
 
-	_, err := m.Reader.ReadAt(testingBuffer[:1], 9)
+	_, err := m.Reader().ReadAt(testingBuffer[:1], 9)
 	assert.ErrorContains(t, err, "r--")
 	assert.ErrorContains(t, err, "9")
 
-	_, err = m.ReaderExecute.ReadAt(testingBuffer[:1], 26)
+	_, err = m.ReaderX().ReadAt(testingBuffer[:1], 26)
 	assert.ErrorContains(t, err, "--x")
 	assert.ErrorContains(t, err, "0x1a")
 
-	_, err = m.Writer.WriteAt(testingBuffer[:1], 9)
+	_, err = m.Writer().WriteAt(testingBuffer[:1], 9)
 	assert.ErrorContains(t, err, "-w-")
 	assert.ErrorContains(t, err, "9")
 }
@@ -84,25 +84,32 @@ func TestPermissions(t *testing.T) {
 	m := NewMemFromMemory()
 	m.Alloc(10, 10, PermRead)
 
-	_, err := m.Reader.ReadAt(testingBuffer[:1], 10)
+	_, err := m.Reader().ReadAt(testingBuffer[:1], 10)
 	assert.NoError(t, err)
 
-	_, err = m.Writer.WriteAt(testingBuffer[:1], 10)
+	_, err = m.Writer().WriteAt(testingBuffer[:1], 10)
 	assert.Error(t, err)
 
-	_, err = m.ReaderExecute.ReadAt(testingBuffer[:1], 10)
+	_, err = m.ReaderX().ReadAt(testingBuffer[:1], 10)
 	assert.Error(t, err)
 }
 
 func TestFree(t *testing.T) {
 	m := NewMemFromMemory()
 	m.Alloc(10, 10, PermRead)
+	m.Alloc(20, 10, PermRead)
 
 	assert.Error(t, m.Free(11))
-	assert.Contains(t, m.blocks, int64(10))
+	assert.Contains(t, m.blocks, uint64(10))
+	assert.Contains(t, m.blocks, uint64(20))
 
 	assert.NoError(t, m.Free(10))
 	assert.NotContains(t, m.blocks, 10)
+	assert.Contains(t, m.blocks, uint64(20))
+
+	assert.NoError(t, m.Close())
+	assert.NotContains(t, m.blocks, 10)
+	assert.NotContains(t, m.blocks, 20)
 }
 
 func cleanTestingBuffer() {
